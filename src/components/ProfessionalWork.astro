@@ -1,0 +1,112 @@
+---
+const projects = [
+    {
+        title: "THE ARCHIVIST",
+        img: "https://placehold.co/600x800/111/fff?text=Project+1",
+    },
+    {
+        title: "NEON GHOST",
+        img: "https://placehold.co/600x800/111/fff?text=Project+2",
+    },
+    {
+        title: "KIDS SHOW S2",
+        img: "https://placehold.co/600x800/111/fff?text=Project+3",
+    },
+];
+---
+
+<section class="work-section container">
+    <div class="header">
+        <h2 class="section-title">PROFESSIONAL WORK</h2>
+        <div class="tags">
+            <span class="pill">3D MODELLING</span>
+            <span class="pill">SHADING</span>
+            <span class="pill">LIGHTING</span>
+        </div>
+    </div>
+
+    <div class="grid">
+        {
+            projects.map((project) => (
+                <div class="card">
+                    <img src={project.img} alt={project.title} loading="lazy" />
+                    <h3>{project.title}</h3>
+                </div>
+            ))
+        }
+    </div>
+</section>
+
+<style>
+    .work-section {
+        padding-top: 5rem;
+        padding-bottom: 5rem;
+        position: relative;
+        z-index: 20;
+        background: var(--bg-color);
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4rem;
+        flex-wrap: wrap;
+        gap: 2rem;
+    }
+
+    .section-title {
+        font-size: 5rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        background: var(--text-color);
+        color: var(--bg-color);
+        padding: 0.5rem 2rem;
+        border-radius: 100px;
+    }
+
+    .tags {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-end;
+    }
+
+    .pill {
+        border: 1px solid var(--text-color);
+        padding: 0.3rem 1rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 20px;
+        transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-10px);
+    }
+
+    .card img {
+        width: 100%;
+        height: auto;
+        border-radius: 20px;
+        aspect-ratio: 3/4;
+        object-fit: cover;
+    }
+
+    .card h3 {
+        margin-top: 1rem;
+        font-size: 1.5rem;
+        text-align: center;
+    }
+</style>

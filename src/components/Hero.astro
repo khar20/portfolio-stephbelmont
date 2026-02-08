@@ -1,0 +1,218 @@
+---
+import ThreeScene from "./ThreeScene.svelte";
+---
+
+<section class="hero-section">
+    <div class="background-text">
+        <div class="top-bar container">
+            <div class="artist-name fade-in">STEPHANI BELMONT</div>
+            <div class="skills fade-in">
+                <span class="pill">3D MODELLING</span>
+                <span class="pill">SHADING</span>
+                <span class="pill">LIGHTING</span>
+            </div>
+        </div>
+
+        <h1 class="main-title fade-in-up">PORTFOLIO</h1>
+
+        <div class="bottom-ui container">
+            <div class="role-badge fade-in-up">3D ARTIST</div>
+            <div class="contact-area fade-in-up">
+                <a href="#contact" class="contact-btn">CONTACT ME</a>
+                <div class="socials">
+                    <p>EMAIL / steph.belmont@example.com</p>
+                    <p>INSTA / polaris.s.b</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="model-wrapper fade-in-slow">
+        <ThreeScene client:load />
+    </div>
+</section>
+
+<script>
+    import { gsap } from "gsap";
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    window.addEventListener("load", () => {
+        const tl = gsap.timeline();
+
+        tl.to(".fade-in", {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            stagger: 0.1,
+            ease: "power3.out",
+        })
+            .to(
+                ".fade-in-up",
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    stagger: 0.1,
+                    ease: "power3.out",
+                },
+                "-=0.5",
+            )
+            .to(
+                ".fade-in-slow",
+                {
+                    opacity: 1,
+                    duration: 2,
+                    ease: "power2.out",
+                },
+                "-=1",
+            );
+
+        gsap.to(".hero-section", {
+            scrollTrigger: {
+                trigger: ".hero-section",
+                start: "top top",
+                end: "bottom top",
+                scrub: true,
+            },
+            yPercent: 30,
+            opacity: 0.5,
+        });
+
+        gsap.to(".model-wrapper", {
+            scrollTrigger: {
+                trigger: ".hero-section",
+                start: "top top",
+                end: "bottom top",
+                scrub: true,
+            },
+            y: 100,
+            scale: 0.8,
+        });
+    });
+</script>
+
+<style>
+    .hero-section {
+        position: relative;
+        height: 100vh;
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .top-bar {
+        position: absolute;
+        top: 2rem;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        z-index: 10;
+    }
+
+    .artist-name {
+        font-weight: 700;
+        letter-spacing: 2px;
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    .skills {
+        display: flex;
+        gap: 1rem;
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    .pill {
+        border: 1px solid var(--text-color);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+    }
+
+    .main-title {
+        font-size: 18vw;
+        text-align: center;
+        line-height: 0.8;
+        font-weight: 900;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+        letter-spacing: -5px;
+        opacity: 0;
+        transform: translateY(50px);
+        pointer-events: none;
+        mix-blend-mode: exclusion;
+    }
+
+    .bottom-ui {
+        position: absolute;
+        bottom: 3rem;
+        left: 0;
+        right: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        z-index: 10;
+    }
+
+    .role-badge {
+        font-size: 3rem;
+        font-weight: 800;
+        border: 2px solid var(--text-color);
+        padding: 0.5rem 2rem;
+        border-radius: 20px;
+        background: var(--bg-color);
+        text-transform: uppercase;
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    .contact-area {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 1rem;
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    .contact-btn {
+        border: 1px solid var(--text-color);
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        text-transform: uppercase;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .contact-btn:hover {
+        background: var(--text-color);
+        color: var(--bg-color);
+    }
+
+    .socials p {
+        font-size: 0.8rem;
+        opacity: 0.7;
+        margin-bottom: 0.2rem;
+    }
+
+    .model-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        opacity: 0;
+    }
+</style>
