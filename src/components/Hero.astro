@@ -12,8 +12,24 @@ import ThreeScene from "./ThreeScene.svelte";
         </div>
     </div>
 
-    <div class="name-container fade-in-up">
-        <h1 class="artist-name">STEPH<br />BELMONTE</h1>
+    <div class="main-content container">
+        <div class="name-container fade-in-up">
+            <div class="astroid-icon">
+                <svg
+                    viewBox="0 0 100 100"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M50 0C50 27.6142 27.6142 50 0 50C27.6142 50 50 72.3858 50 100C50 72.3858 72.3858 50 100 50C72.3858 50 50 27.6142 50 0Z"
+                        fill="currentColor"></path>
+                </svg>
+            </div>
+            <h1 class="artist-name">
+                STEPHANI<br />
+                BELMONTE
+            </h1>
+        </div>
     </div>
 
     <div class="bottom-ui container">
@@ -27,6 +43,17 @@ import ThreeScene from "./ThreeScene.svelte";
     <div id="about-overlay" class="about-overlay">
         <div class="about-content">
             <button id="about-close" class="close-btn">✕</button>
+            <div class="overlay-icon">
+                <svg
+                    viewBox="0 0 100 100"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M50 0C50 27.6142 27.6142 50 0 50C27.6142 50 50 72.3858 50 100C50 72.3858 72.3858 50 100 50C72.3858 50 50 27.6142 50 0Z"
+                        fill="currentColor"></path>
+                </svg>
+            </div>
             <h2>ABOUT STEPH</h2>
             <p>
                 Minimalist 3D Artist based in the digital ether. Specializing in
@@ -41,6 +68,7 @@ import ThreeScene from "./ThreeScene.svelte";
         </div>
     </div>
 
+    <!-- 3D Scene Wrapper -->
     <div class="model-wrapper fade-in-slow">
         <ThreeScene client:load />
     </div>
@@ -75,7 +103,7 @@ import ThreeScene from "./ThreeScene.svelte";
             )
             .to(".fade-in-slow", { opacity: 1, duration: 2 }, "-=1");
 
-        // parallax effect
+        // parallax on scroll
         gsap.to(".artist-name", {
             scrollTrigger: {
                 trigger: ".hero-section",
@@ -83,37 +111,53 @@ import ThreeScene from "./ThreeScene.svelte";
                 end: "bottom top",
                 scrub: true,
             },
-            y: -150,
+            y: -50,
             opacity: 0,
+        });
+
+        gsap.to(".model-wrapper", {
+            scrollTrigger: {
+                trigger: ".hero-section",
+                start: "top top",
+                end: "bottom top",
+                scrub: true,
+            },
+            y: 100,
             scale: 0.9,
         });
 
-        // overlay logic
-        const trigger = document.getElementById("about-trigger");
-        const close = document.getElementById("about-close");
-        const overlay = document.getElementById("about-overlay");
+        const trigger = document.getElementById(
+            "about-trigger",
+        ) as HTMLButtonElement | null;
+        const close = document.getElementById(
+            "about-close",
+        ) as HTMLButtonElement | null;
+        const overlay = document.getElementById(
+            "about-overlay",
+        ) as HTMLDivElement | null;
 
-        trigger?.addEventListener("click", () => {
-            gsap.to(overlay, {
-                display: "flex",
-                opacity: 1,
-                duration: 0.5,
-                ease: "power2.out",
+        if (trigger && overlay) {
+            trigger.addEventListener("click", () => {
+                gsap.to(overlay, {
+                    display: "flex",
+                    opacity: 1,
+                    duration: 0.5,
+                    ease: "power2.out",
+                });
             });
-        });
+        }
 
-        close?.addEventListener("click", () => {
-            if (!overlay) {
-                return;
-            }
-            gsap.to(overlay, {
-                opacity: 0,
-                duration: 0.3,
-                onComplete: () => {
-                    overlay.style.display = "none";
-                },
+        if (close && overlay) {
+            close.addEventListener("click", () => {
+                gsap.to(overlay, {
+                    opacity: 0,
+                    duration: 0.3,
+                    onComplete: () => {
+                        overlay.style.display = "none";
+                    },
+                });
             });
-        });
+        }
     });
 </script>
 
@@ -124,21 +168,21 @@ import ThreeScene from "./ThreeScene.svelte";
         height: 100dvh;
         width: 100%;
         overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         background: var(--bg-color);
     }
 
     .container {
-        padding: 0 1.5rem;
+        padding: 0 2rem;
         width: 100%;
-        max-width: 1400px;
+        max-width: 1600px;
+        margin: 0 auto;
     }
 
     .top-bar {
         position: absolute;
-        top: 1.5rem;
+        top: 2rem;
+        left: 0;
+        right: 0;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -149,8 +193,8 @@ import ThreeScene from "./ThreeScene.svelte";
         font-weight: 700;
         opacity: 0;
         transform: translateY(-10px);
+        letter-spacing: 1px;
     }
-
     .skills {
         display: flex;
         gap: 0.5rem;
@@ -164,30 +208,56 @@ import ThreeScene from "./ThreeScene.svelte";
         border-radius: 20px;
         font-size: 0.65rem;
         letter-spacing: 1px;
+        color: var(--accent-color);
+    }
+
+    .main-content {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        position: relative;
+        z-index: 10;
     }
 
     .name-container {
         position: relative;
-        z-index: 10;
-        text-align: center;
         opacity: 0;
         transform: translateY(30px);
-        pointer-events: none;
+        z-index: 15;
+        max-width: 60%;
+    }
+
+    .astroid-icon {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 1rem;
+        color: var(--text-color);
     }
 
     .artist-name {
-        font-size: clamp(4rem, 15vw, 12rem);
-        line-height: 0.85;
-        font-weight: 900;
+        font-family: "Italiana", serif;
+        font-size: clamp(4rem, 11vw, 10rem);
+        line-height: 0.9;
+        font-weight: 400;
         margin: 0;
-        letter-spacing: -0.05em;
-        mix-blend-mode: difference;
+        letter-spacing: -0.02em;
         text-transform: uppercase;
+        color: var(--text-color);
+    }
+
+    .model-wrapper {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        opacity: 0;
+        pointer-events: none;
     }
 
     .bottom-ui {
         position: absolute;
         bottom: 2rem;
+        left: 0;
+        right: 0;
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
@@ -195,32 +265,37 @@ import ThreeScene from "./ThreeScene.svelte";
     }
 
     .role-badge {
-        font-size: clamp(1rem, 4vw, 2.5rem);
-        font-weight: 800;
-        border: 1.5px solid var(--text-color);
-        padding: 0.4rem 1.2rem;
-        border-radius: 12px;
+        font-family: var(--font-main);
+        font-size: clamp(1rem, 2vw, 1.5rem);
+        font-weight: 300;
+        border: 1px solid var(--text-color);
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
         opacity: 0;
         transform: translateY(20px);
+        letter-spacing: 2px;
+        text-transform: uppercase;
     }
 
     .actions {
         display: flex;
-        gap: 0.75rem;
+        gap: 1rem;
         opacity: 0;
         transform: translateY(20px);
     }
 
     .btn {
-        padding: 0.8rem 1.5rem;
+        padding: 0.8rem 2rem;
         border-radius: 50px;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
         border: 1px solid var(--text-color);
         background: transparent;
         color: var(--text-color);
+        letter-spacing: 1px;
+        text-transform: uppercase;
     }
 
     .btn.primary {
@@ -237,7 +312,7 @@ import ThreeScene from "./ThreeScene.svelte";
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.95);
+        background: rgba(10, 10, 10, 0.98);
         z-index: 100;
         display: none;
         opacity: 0;
@@ -247,56 +322,75 @@ import ThreeScene from "./ThreeScene.svelte";
     }
 
     .about-content {
-        max-width: 600px;
+        max-width: 500px;
         position: relative;
-        text-align: left;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .overlay-icon {
+        width: 40px;
+        margin-bottom: 2rem;
+        color: var(--text-color);
     }
 
     .about-content h2 {
-        font-size: 3rem;
+        font-family: var(--font-main);
+        font-size: 2rem;
         margin-bottom: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 2px;
     }
+
     .about-content p {
-        font-size: 1.2rem;
-        line-height: 1.6;
-        opacity: 0.8;
-        margin-bottom: 2rem;
+        font-size: 1rem;
+        line-height: 1.8;
+        opacity: 0.7;
+        margin-bottom: 3rem;
+        font-family: var(--font-main);
     }
 
     .close-btn {
         position: absolute;
-        top: -3rem;
+        top: -4rem;
         right: 0;
         background: none;
         border: none;
         color: white;
-        font-size: 2rem;
+        font-size: 1.5rem;
         cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .overlay-socials {
         display: flex;
         gap: 2rem;
-        font-size: 0.8rem;
+        font-size: 0.7rem;
         opacity: 0.5;
+        letter-spacing: 1px;
     }
 
-    .model-wrapper {
-        position: absolute;
-        inset: 0;
-        z-index: 5;
-        opacity: 0;
-    }
-
-    @media (max-width: 768px) {
-        .skills {
-            display: none;
+    @media (max-width: 900px) {
+        .name-container {
+            max-width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+
         .bottom-ui {
             flex-direction: column;
             align-items: center;
             gap: 2rem;
-            text-align: center;
             bottom: 3rem;
         }
         .role-badge {
@@ -304,8 +398,10 @@ import ThreeScene from "./ThreeScene.svelte";
         }
         .actions {
             order: 1;
-            width: 100%;
-            justify-content: center;
+        }
+
+        .skills {
+            display: none;
         }
         .top-bar {
             justify-content: center;
