@@ -1,21 +1,21 @@
-<script lang="ts">
+<script>
     import { onMount } from "svelte";
     import * as THREE from "three";
-    import { gsap } from "gsap";
 
-    let canvasContainer: HTMLDivElement;
+    let canvasContainer;
 
     onMount(() => {
+        // scene setup
         const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.02);
 
         const camera = new THREE.PerspectiveCamera(
-            35,
+            75,
             window.innerWidth / window.innerHeight,
             0.1,
             1000,
         );
-        camera.position.z = 8;
-        camera.position.x = 0;
+        camera.position.z = 5;
 
         const renderer = new THREE.WebGLRenderer({
             alpha: true,
@@ -23,64 +23,103 @@
         });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.2;
-
         canvasContainer.appendChild(renderer.domElement);
 
-        const geometry = new THREE.TorusKnotGeometry(1.2, 0.4, 150, 20);
-        const material = new THREE.MeshPhysicalMaterial({
-            color: 0x111111,
-            roughness: 0.15,
-            metalness: 0.1,
-            clearcoat: 1.0,
-            clearcoatRoughness: 0.1,
-            side: THREE.DoubleSide,
-        });
+        // star field
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        const posArray = new Float32Array(particlesCount * 3);
 
-        const torus = new THREE.Mesh(geometry, material);
+        for (let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 20;
+        }
 
-        torus.position.set(1.5, 0, 0);
-
-        torus.rotation.set(0.5, -0.5, 0);
-
-        scene.add(torus);
-
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-        scene.add(ambientLight);
-
-        const rectLight = new THREE.RectAreaLight(0xffffff, 5, 10, 10);
-        rectLight.position.set(5, 5, 5);
-        rectLight.lookAt(0, 0, 0);
-        scene.add(rectLight);
-
-        const blueRim = new THREE.SpotLight(0x4444ff, 10);
-        blueRim.position.set(-5, -5, 2);
-        scene.add(blueRim);
-
-        gsap.fromTo(
-            torus.rotation,
-            { y: -Math.PI, x: 1 },
-            {
-                y: -0.2,
-                x: 0.4,
-                duration: 3.5,
-                ease: "power3.out",
-            },
+        particlesGeometry.setAttribute(
+            "position",
+            new THREE.BufferAttribute(posArray, 3),
         );
 
-        gsap.from(torus.scale, {
-            x: 0,
-            y: 0,
-            z: 0,
-            duration: 2.5,
-            ease: "elastic.out(1, 0.75)",
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.02,
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending,
         });
 
+        const particlesMesh = new THREE.Points(
+            particlesGeometry,
+            particlesMaterial,
+        );
+        scene.add(particlesMesh);
+
+        // main model
+        const geoGeometry = new THREE.IcosahedronGeometry(1.5, 0);
+        const geoMaterial = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            roughness: 0.1,
+            metalness: 0.1,
+            flatShading: true,
+        });
+
+        const geoMesh = new THREE.Mesh(geoGeometry, geoMaterial);
+        geoMesh.position.set(3, 0, 0);
+        scene.add(geoMesh);
+
+        // lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0xffffff, 2);
+        mainLight.position.set(2, 2, 5);
+        scene.add(mainLight);
+
+        const fillLight = new THREE.PointLight(0x8888ff, 0.5);
+        fillLight.position.set(-5, 0, 2);
+        scene.add(fillLight);
+
+        // mouse interaction
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
+
+        const onDocumentMouseMove = (event) => {
+            mouseX = event.clientX - windowHalfX;
+            mouseY = event.clientY - windowHalfY;
+        };
+
+        document.addEventListener("mousemove", onDocumentMouseMove);
+
+        // animation loop
+        const clock = new THREE.Clock();
+
         function animate() {
-            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+
+            targetX = mouseX * 0.001;
+            targetY = mouseY * 0.001;
+
+            // rotation
+            geoMesh.rotation.y += 0.005;
+            geoMesh.rotation.x += 0.002;
+
+            // floating
+            geoMesh.position.y = Math.sin(elapsedTime * 0.5) * 0.2;
+
+            // parallax stars
+            particlesMesh.rotation.y = elapsedTime * 0.05;
+            particlesMesh.rotation.x = mouseY * 0.00005;
+            particlesMesh.position.x +=
+                (mouseX * 0.0005 - particlesMesh.position.x) * 0.05;
+            particlesMesh.position.y +=
+                (-mouseY * 0.0005 - particlesMesh.position.y) * 0.05;
+
             renderer.render(scene, camera);
+            requestAnimationFrame(animate);
         }
 
         animate();
@@ -90,22 +129,22 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
 
-            if (window.innerWidth < 900) {
-                torus.position.set(0, 1, 0);
+            if (window.innerWidth < 768) {
+                geoMesh.position.set(0, 1.5, 0);
+                geoMesh.scale.set(0.8, 0.8, 0.8);
             } else {
-                torus.position.set(1.5, 0, 0);
+                geoMesh.position.set(3, 0, 0);
+                geoMesh.scale.set(1, 1, 1);
             }
         };
 
-        handleResize();
-
         window.addEventListener("resize", handleResize);
+        handleResize();
 
         return () => {
             window.removeEventListener("resize", handleResize);
+            document.removeEventListener("mousemove", onDocumentMouseMove);
             renderer.dispose();
-            geometry.dispose();
-            material.dispose();
         };
     });
 </script>
@@ -114,8 +153,11 @@
 
 <style>
     .webgl-container {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
-        display: block;
+        z-index: 1;
     }
 </style>
